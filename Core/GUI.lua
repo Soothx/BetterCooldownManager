@@ -71,6 +71,7 @@ local ParentAnchors = {
 }
 
 local function AddAnchor(anchorGroup, key, label)
+    for _, existingKey in ipairs(anchorGroup[2]) do if existingKey == key then return end end
     anchorGroup[1][key] = label
     table.insert(anchorGroup[2], key)
 end
