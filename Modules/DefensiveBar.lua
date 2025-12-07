@@ -79,6 +79,9 @@ local DefensiveSpells = {
         [186265] = true,        -- Aspect of the Turtle
         [264735] = true,        -- Survival of the Fittest
         [109304] = true,        -- Exhilaration
+        [272679] = true,        -- Command Pet: Fortitude of the Bear
+        [272682] = true,        -- Command Pet: Master's Call
+        [272678] = true,        -- Command Pet: Primal Rage
     },
     -- Rogue
     ["ROGUE"] = {
@@ -96,7 +99,8 @@ function CreateCustomIcon(spellId)
     local GeneralDB = CooldownManagerDB.General
     local DefensiveDB = CooldownManagerDB.Defensive
     if not spellId then return end
-    if not C_SpellBook.IsSpellKnown(spellId) then return end
+    -- if not C_SpellBook.IsSpellKnown(spellId, Enum.SpellBookSpellBank.Player) and not C_SpellBook.IsSpellKnown(spellId, Enum.SpellBookSpellBank.Pet) then return end
+    if not C_SpellBook.IsSpellInSpellBook(spellId) then return end
 
     local customSpellIcon = CreateFrame("Button", "BCDM_Custom_" .. spellId, UIParent, "BackdropTemplate")
     customSpellIcon:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
@@ -247,7 +251,6 @@ function BCDM:ResetCustomIcons()
     LayoutCustomIcons()
 end
 
-
 function BCDM:UpdateDefensiveIcons()
     local CooldownManagerDB = BCDM.db.profile
     local GeneralDB = CooldownManagerDB.General
@@ -268,3 +271,12 @@ function BCDM:UpdateDefensiveIcons()
     end
     LayoutCustomIcons()
 end
+
+local SpellsChangedEventFrame = CreateFrame("Frame")
+SpellsChangedEventFrame:RegisterEvent("SPELLS_CHANGED")
+SpellsChangedEventFrame:SetScript("OnEvent", function(self, event, ...)
+    if event == "SPELLS_CHANGED" then
+        if InCombatLockdown() then return end
+        BCDM:ResetCustomIcons()
+    end
+end)
