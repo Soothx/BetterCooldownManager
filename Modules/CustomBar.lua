@@ -289,15 +289,11 @@ end)
 
 function BCDM:CopyCustomSpellsToDB()
     local profileDB = BCDM.db.profile
+    local sourceTable = BCDM.CustomSpells
 
-    local _, class = UnitClass("player")
-    local sourceTable = CustomSpells[class]
-    if not profileDB.Custom.CustomSpells[class] then profileDB.Custom.CustomSpells[class] = {} end
-
-    local classDB = profileDB.Custom.CustomSpells[class]
     for spellId, value in pairs(sourceTable) do
-        if classDB[spellId] == nil then
-            classDB[spellId] = value
+        if profileDB.Custom.CustomSpells[spellId] == nil then
+            profileDB.Custom.CustomSpells[spellId] = value
         end
     end
 end
