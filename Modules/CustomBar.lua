@@ -489,7 +489,6 @@ function BCDM:AddCustomSpell(value)
     BCDM:ResetCustomIcons()
 end
 
-
 function BCDM:RemoveCustomSpell(value)
     if not value then return end
     local info = C_Spell.GetSpellInfo(value)
