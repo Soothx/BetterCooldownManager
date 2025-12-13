@@ -961,6 +961,7 @@ local function DrawItemBarSettings(parentContainer)
     if C_AddOns.IsAddOnLoaded("UnhaltedUnitFrames") then
         AddAnchor(ParentAnchors.Custom, "UUF_Player", "|cFF8080FFUnhalted|r Unit Frames - Player")
         AddAnchor(ParentAnchors.Custom, "UUF_Target", "|cFF8080FFUnhalted|r Unit Frames - Target")
+        AddAnchor(ParentAnchors.Custom, "UUF_Pet", "|cFF8080FFUnhalted|r Unit Frames - Target")
     end
 
     local ParentSelector = AG:Create("Dropdown")
