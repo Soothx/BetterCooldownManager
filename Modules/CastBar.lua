@@ -85,7 +85,6 @@ local function CreateCastBar()
         UNIT_SPELLCAST_STOP = true,
         UNIT_SPELLCAST_CHANNEL_STOP = true,
         PLAYER_TARGET_CHANGED = true,
-        UNIT_SPELLCAST_FAILED = true,
         UNIT_SPELLCAST_INTERRUPTED = true,
     }
 
