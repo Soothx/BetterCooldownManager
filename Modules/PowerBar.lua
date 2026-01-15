@@ -19,6 +19,36 @@ local function FetchPowerBarColour()
     end
 end
 
+local function DetectSecondaryPower()
+    local class = select(2, UnitClass("player"))
+    local spec  = GetSpecialization()
+    local specID = GetSpecializationInfo(spec)
+    if class == "MONK" then
+        if specID == 268 then return true end
+        if specID == 269 then return true end
+    elseif class == "ROGUE" then
+        return true
+    elseif class == "DRUID" then
+        local form = GetShapeshiftFormID()
+        if form == 1 then return true end
+    elseif class == "PALADIN" then
+        return true
+    elseif class == "WARLOCK" then
+        return true
+    elseif class == "MAGE" then
+        if specID == 62 then return true end
+    elseif class == "EVOKER" then
+        return true
+    elseif class == "DEATHKNIGHT" then
+        return true
+    elseif class == "DEMONHUNTER" then
+        if specID == 1480 then return true end
+    elseif class == "SHAMAN" then
+        if specID == 263 then return true end
+    end
+    return false
+end
+
 local function NudgePowerBar(powerBar, xOffset, yOffset)
     local powerBarFrame = _G[powerBar]
     if not powerBarFrame then return end
@@ -58,7 +88,8 @@ function BCDM:CreatePowerBar()
     PowerBar:SetBackdrop(BCDM.BACKDROP)
     PowerBar:SetBackdropColor(PowerBarDB.BackgroundColour[1], PowerBarDB.BackgroundColour[2], PowerBarDB.BackgroundColour[3], PowerBarDB.BackgroundColour[4])
     PowerBar:SetBackdropBorderColor(0, 0, 0, 1)
-    PowerBar:SetSize(PowerBarDB.Width, PowerBarDB.Height)
+    local hasSecondary = DetectSecondaryPower()
+    PowerBar:SetSize(PowerBarDB.Width, hasSecondary and PowerBarDB.Height or PowerBarDB.HeightWithoutSecondary)
     PowerBar:SetPoint(PowerBarDB.Layout[1], _G[PowerBarDB.Layout[2]], PowerBarDB.Layout[3], PowerBarDB.Layout[4], PowerBarDB.Layout[5])
     PowerBar:SetFrameStrata("MEDIUM")
 
@@ -124,7 +155,8 @@ function BCDM:UpdatePowerBar()
             else
                 PowerBar:SetWidth(PowerBarDB.Width)
             end
-            PowerBar:SetHeight(PowerBarDB.Height)
+            local hasSecondary = DetectSecondaryPower()
+            PowerBar:SetHeight(hasSecondary and PowerBarDB.Height or PowerBarDB.HeightWithoutSecondary)
             PowerBar:SetBackdropColor(PowerBarDB.BackgroundColour[1], PowerBarDB.BackgroundColour[2], PowerBarDB.BackgroundColour[3], PowerBarDB.BackgroundColour[4])
             PowerBar.Status:SetStatusBarTexture(BCDM.Media.Foreground)
             PowerBar.Text:SetFont(BCDM.Media.Font, PowerBarDB.Text.FontSize, BCDM.db.profile.General.Fonts.FontFlag)

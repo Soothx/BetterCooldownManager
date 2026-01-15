@@ -140,6 +140,36 @@ local function FetchSpellInformation(spellId)
     end
 end
 
+local function DetectSecondaryPower()
+    local class = select(2, UnitClass("player"))
+    local spec  = GetSpecialization()
+    local specID = GetSpecializationInfo(spec)
+    if class == "MONK" then
+        if specID == 268 then return true end
+        if specID == 269 then return true end
+    elseif class == "ROGUE" then
+        return true
+    elseif class == "DRUID" then
+        local form = GetShapeshiftFormID()
+        if form == 1 then return true end
+    elseif class == "PALADIN" then
+        return true
+    elseif class == "WARLOCK" then
+        return true
+    elseif class == "MAGE" then
+        if specID == 62 then return true end
+    elseif class == "EVOKER" then
+        return true
+    elseif class == "DEATHKNIGHT" then
+        return true
+    elseif class == "DEMONHUNTER" then
+        if specID == 1480 then return true end
+    elseif class == "SHAMAN" then
+        if specID == 263 then return true end
+    end
+    return false
+end
+
 local function GenerateSupportText(parentFrame)
     local SupportOptions = {
         "Support Me on |TInterface\\AddOns\\UnhaltedUnitFrames\\Media\\Support\\Ko-Fi.png:13:18|t |cFF8080FFKo-Fi|r!",
@@ -1267,8 +1297,17 @@ local function CreatePowerBarSettings(parentContainer)
     heightSlider:SetValue(BCDM.db.profile.PowerBar.Height)
     heightSlider:SetSliderValues(5, 500, 1)
     heightSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Height = value BCDM:UpdatePowerBar() end)
-    heightSlider:SetRelativeWidth(0.5)
+    heightSlider:SetRelativeWidth(0.25)
     layoutContainer:AddChild(heightSlider)
+
+    local heightSliderWithoutSecondary = AG:Create("Slider")
+    heightSliderWithoutSecondary:SetLabel("Height (No Secondary Power)")
+    heightSliderWithoutSecondary:SetValue(BCDM.db.profile.PowerBar.HeightWithoutSecondary)
+    heightSliderWithoutSecondary:SetSliderValues(5, 500, 1)
+    heightSliderWithoutSecondary:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.HeightWithoutSecondary = value BCDM:UpdatePowerBar() end)
+    heightSliderWithoutSecondary:SetRelativeWidth(0.25)
+    heightSliderWithoutSecondary:SetDisabled(DetectSecondaryPower())
+    layoutContainer:AddChild(heightSliderWithoutSecondary)
 
     local xOffsetSlider = AG:Create("Slider")
     xOffsetSlider:SetLabel("X Offset")
