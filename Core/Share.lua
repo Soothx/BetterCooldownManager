@@ -15,7 +15,7 @@ function BCDM:ImportSavedVariables(EncodedInfo, profileName)
     local DecodedInfo = Compress:DecodeForPrint(EncodedInfo:sub(6))
     local DecompressedInfo = Compress:DecompressDeflate(DecodedInfo)
     local success, data = Serialize:Deserialize(DecompressedInfo)
-    if not success or type(data) ~= "table" or EncodedInfo:sub(1, 5) ~= "!BCDM_" then print("|cFF8080FFUnhalted|r Unit Frames: Invalid Import String.") return end
+    if not success or type(data) ~= "table" or EncodedInfo:sub(1, 6) ~= "!BCDM_" then BCDM:PrettyPrint("Invalid Import String.") return end
 
     if profileName then
         BCDM.db:SetProfile(profileName)
