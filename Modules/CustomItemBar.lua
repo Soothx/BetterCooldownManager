@@ -41,6 +41,17 @@ local function ApplyCooldownText()
     end
 end
 
+local function IsCooldownFrameActive(customIcon)
+    -- Thanks Mapko for this idea!
+    if not customIcon or not customIcon.Cooldown then return end
+
+    if customIcon.Cooldown:IsShown() then
+        customIcon.Icon:SetDesaturated(true)
+    else
+        customIcon.Icon:SetDesaturated(false)
+    end
+end
+
 local function FetchItemData(itemId)
     local itemCount = C_Item.GetItemCount(itemId)
     if itemId == 224464 or itemId == 5512 then itemCount = C_Item.GetItemCount(itemId, false, true) end
@@ -104,6 +115,7 @@ local function CreateCustomIcon(itemId)
                 end
                 customIcon.Charges:SetAlphaFromBoolean(itemCount > 1, 1, 0)
             end
+            IsCooldownFrameActive(self)
         end
     end)
 

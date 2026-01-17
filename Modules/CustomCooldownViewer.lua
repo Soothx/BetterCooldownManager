@@ -41,6 +41,16 @@ local function ApplyCooldownText()
     end
 end
 
+local function IsCooldownFrameActive(customIcon)
+    if not customIcon or not customIcon.Cooldown then return end
+
+    if customIcon.Cooldown:IsShown() then
+        customIcon.Icon:SetDesaturated(true)
+    else
+        customIcon.Icon:SetDesaturated(false)
+    end
+end
+
 local function CreateCustomIcon(spellId)
     local CooldownManagerDB = BCDM.db.profile
     local GeneralDB = CooldownManagerDB.General
@@ -91,6 +101,7 @@ local function CreateCustomIcon(spellId)
                 local cooldownData = C_Spell.GetSpellCooldown(spellId)
                 customIcon.Cooldown:SetCooldown(cooldownData.startTime, cooldownData.duration)
             end
+            IsCooldownFrameActive(self)
         end
     end)
 
