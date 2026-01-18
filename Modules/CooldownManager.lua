@@ -17,6 +17,17 @@ local function FetchCooldownTextRegion(cooldown)
     end
 end
 
+function BCDM:CalculateTexCoords(zoom, iconWidth, iconHeight)
+    if not zoom or not iconWidth or not iconHeight or iconWidth == 0 then
+        return 0, 1, 0, 1
+    end
+    
+    local aspectRatio = iconHeight / iconWidth
+    local horizontalCrop = math.max(0, (1 - (1 / aspectRatio)) / 2)
+    local verticalCrop = math.max(0, (1 - aspectRatio) / 2)
+    return zoom + horizontalCrop, 1 - zoom - horizontalCrop, zoom + verticalCrop, 1 - zoom - verticalCrop
+end
+
 -- local function FetchClassColour()
 --     local CooldownManagerDB = BCDM.db.profile
 --     local GeneralDB = CooldownManagerDB.General
