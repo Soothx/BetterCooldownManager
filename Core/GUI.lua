@@ -1954,14 +1954,20 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
         if not BCDM.db.profile.SecondaryPowerBar.Enabled then
             for _, child in ipairs(toggleContainer.children) do
                 if child ~= enabledCheckbox then
-                    child:SetDisabled(true)
+                    if child.SetDisabled then
+                        child:SetDisabled(true)
+                    end
                 end
             end
             for _, child in ipairs(layoutContainer.children) do
-                child:SetDisabled(true)
+                if child.SetDisabled then
+                    child:SetDisabled(true)
+                end
             end
             for _, child in ipairs(textContainer.children) do
-                child:SetDisabled(true)
+                if child.SetDisabled then
+                    child:SetDisabled(true)
+                end
             end
         else
             for _, child in ipairs(toggleContainer.children) do
@@ -1970,10 +1976,14 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
                 end
             end
             for _, child in ipairs(layoutContainer.children) do
-                child:SetDisabled(false)
+                if child.SetDisabled then
+                    child:SetDisabled(false)
+                end
             end
             for _, child in ipairs(textContainer.children) do
-                child:SetDisabled(false)
+                if child.SetDisabled then
+                    child:SetDisabled(false)
+                end
             end
             if BCDM.db.profile.SecondaryPowerBar.ColourByType or BCDM.db.profile.SecondaryPowerBar.ColourByClass then
                 foregroundColourPicker:SetDisabled(true)
