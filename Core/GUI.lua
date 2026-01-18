@@ -1697,6 +1697,9 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
 
     RefreshSecondaryPowerBarGUISettings()
 
+    parentContainer:DoLayout()
+    ScrollFrame:DoLayout()
+
     return ScrollFrame
 end
 
