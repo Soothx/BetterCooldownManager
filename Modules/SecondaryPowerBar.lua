@@ -5,10 +5,13 @@ local comboPoints = {}
 local essenceTicks = {}
 local resizeTimer = nil
 
+local isDestruction;
+
 local function DetectSecondaryPower()
     local class = select(2, UnitClass("player"))
-    local spec = GetSpecialization()
-    local specID = GetSpecializationInfo(spec)
+    local spec = C_SpecializationInfo.GetSpecialization()
+    local specID = C_SpecializationInfo.GetSpecializationInfo(spec)
+    isDestruction = C_SpecializationInfo.GetSpecializationInfo(C_SpecializationInfo.GetSpecialization()) == 267
 
     if class == "MONK" then
         if specID == 268 then return "STAGGER" end
@@ -462,10 +465,18 @@ local function UpdatePowerValues()
         secondaryPowerBar.Text:SetText(tostring(powerCurrent))
         secondaryPowerBar.Status:Show()
     elseif powerType == Enum.PowerType.SoulShards then
-        powerCurrent = UnitPower("player", Enum.PowerType.SoulShards, true)
-        secondaryPowerBar.Status:SetMinMaxValues(0, 50)
-        secondaryPowerBar.Status:SetValue(powerCurrent)
-        secondaryPowerBar.Text:SetText(string.format("%.1f", powerCurrent / 10))
+        if isDestruction then
+            powerCurrent = UnitPower("player", Enum.PowerType.SoulShards, true)
+            secondaryPowerBar.Status:SetMinMaxValues(0, 50)
+            secondaryPowerBar.Status:SetValue(powerCurrent)
+            secondaryPowerBar.Text:SetText(string.format("%.1f", powerCurrent / 10))
+        else
+            powerCurrent = UnitPower("player", Enum.PowerType.SoulShards, false)
+            local powerMax = UnitPowerMax("player", Enum.PowerType.SoulShards) or 0
+            secondaryPowerBar.Status:SetMinMaxValues(0, powerMax)
+            secondaryPowerBar.Status:SetValue(powerCurrent)
+            secondaryPowerBar.Text:SetText(tostring(powerCurrent))
+        end
         secondaryPowerBar.Status:Show()
     elseif powerType == Enum.PowerType.HolyPower then
         powerCurrent = UnitPower("player", Enum.PowerType.HolyPower) or 0
