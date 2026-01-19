@@ -93,28 +93,45 @@ local AnchorParents = {
         {
             ["EssentialCooldownViewer"] = "|cFF00AEF7Blizzard|r: Essential Cooldown Viewer",
             ["UtilityCooldownViewer"] = "|cFF00AEF7Blizzard|r: Utility Cooldown Viewer",
+            ["PlayerFrame"] = "|cFF00AEF7Blizzard|r: Player Frame",
+            ["TargetFrame"] = "|cFF00AEF7Blizzard|r: Target Frame",
             ["BCDM_PowerBar"] = "|cFF8080FFBetter|rCooldownManager: Power Bar",
             ["BCDM_SecondaryPowerBar"] = "|cFF8080FFBetter|rCooldownManager: Secondary Power Bar",
         },
-        { "EssentialCooldownViewer", "UtilityCooldownViewer", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
+        { "EssentialCooldownViewer", "UtilityCooldownViewer", "PlayerFrame", "TargetFrame", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
     },
     ["AdditionalCustom"] = {
-    {
-        ["EssentialCooldownViewer"] = "|cFF00AEF7Blizzard|r: Essential Cooldown Viewer",
-        ["UtilityCooldownViewer"] = "|cFF00AEF7Blizzard|r: Utility Cooldown Viewer",
-        ["BCDM_PowerBar"] = "|cFF8080FFBetter|rCooldownManager: Power Bar",
-        ["BCDM_SecondaryPowerBar"] = "|cFF8080FFBetter|rCooldownManager: Secondary Power Bar",
-    },
-    { "EssentialCooldownViewer", "UtilityCooldownViewer", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
+        {
+            ["EssentialCooldownViewer"] = "|cFF00AEF7Blizzard|r: Essential Cooldown Viewer",
+            ["UtilityCooldownViewer"] = "|cFF00AEF7Blizzard|r: Utility Cooldown Viewer",
+            ["PlayerFrame"] = "|cFF00AEF7Blizzard|r: Player Frame",
+            ["TargetFrame"] = "|cFF00AEF7Blizzard|r: Target Frame",
+            ["BCDM_PowerBar"] = "|cFF8080FFBetter|rCooldownManager: Power Bar",
+            ["BCDM_SecondaryPowerBar"] = "|cFF8080FFBetter|rCooldownManager: Secondary Power Bar",
+        },
+        { "EssentialCooldownViewer", "UtilityCooldownViewer", "PlayerFrame", "TargetFrame", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
     },
     ["Item"] = {
         {
             ["EssentialCooldownViewer"] = "|cFF00AEF7Blizzard|r: Essential Cooldown Viewer",
             ["UtilityCooldownViewer"] = "|cFF00AEF7Blizzard|r: Utility Cooldown Viewer",
+            ["PlayerFrame"] = "|cFF00AEF7Blizzard|r: Player Frame",
+            ["TargetFrame"] = "|cFF00AEF7Blizzard|r: Target Frame",
             ["BCDM_PowerBar"] = "|cFF8080FFBetter|rCooldownManager: Power Bar",
             ["BCDM_SecondaryPowerBar"] = "|cFF8080FFBetter|rCooldownManager: Secondary Power Bar",
         },
-        { "EssentialCooldownViewer", "UtilityCooldownViewer", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
+        { "EssentialCooldownViewer", "UtilityCooldownViewer", "PlayerFrame", "TargetFrame", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
+    },
+    ["Trinket"] = {
+        {
+            ["EssentialCooldownViewer"] = "|cFF00AEF7Blizzard|r: Essential Cooldown Viewer",
+            ["UtilityCooldownViewer"] = "|cFF00AEF7Blizzard|r: Utility Cooldown Viewer",
+            ["PlayerFrame"] = "|cFF00AEF7Blizzard|r: Player Frame",
+            ["TargetFrame"] = "|cFF00AEF7Blizzard|r: Target Frame",
+            ["BCDM_PowerBar"] = "|cFF8080FFBetter|rCooldownManager: Power Bar",
+            ["BCDM_SecondaryPowerBar"] = "|cFF8080FFBetter|rCooldownManager: Secondary Power Bar",
+        },
+        { "EssentialCooldownViewer", "UtilityCooldownViewer", "PlayerFrame", "TargetFrame", "BCDM_PowerBar", "BCDM_SecondaryPowerBar" },
     },
     ["Power"] = {
         {
@@ -1002,9 +1019,60 @@ local function CreateCooldownViewerItemSettings(parentContainer, containerToRefr
     return parentContainer
 end
 
+local function CreateCooldownViewerTrinketSettings(parentContainer, containerToRefresh)
+    local TrinketDB = BCDM.db.profile.CooldownManager.Trinket.Trinkets
+
+    if TrinketDB then
+
+        local sortedItems = {}
+
+        for spellId, data in pairs(TrinketDB) do table.insert(sortedItems, {id = spellId, data = data}) end
+        table.sort(sortedItems, function(a, b) return a.data.layoutIndex < b.data.layoutIndex end)
+
+        for _, item in ipairs(sortedItems) do
+            local itemId = item.id
+            local data = item.data
+
+            local itemCheckbox = AG:Create("CheckBox")
+            itemCheckbox:SetLabel("[" .. data.layoutIndex .. "] " .. FetchItemInformation(itemId))
+            itemCheckbox:SetValue(data.isActive)
+            itemCheckbox:SetCallback("OnValueChanged", function(_, _, value) TrinketDB[itemId].isActive = value BCDM:UpdateCooldownViewer("Item") end)
+            itemCheckbox:SetRelativeWidth(0.6)
+            parentContainer:AddChild(itemCheckbox)
+
+            local moveUpButton = AG:Create("Button")
+            moveUpButton:SetText("Up")
+            moveUpButton:SetRelativeWidth(0.1333)
+            moveUpButton:SetCallback("OnClick", function() BCDM:AdjustTrinketLayoutIndex(-1, itemId) parentContainer:ReleaseChildren() CreateCooldownViewerTrinketSettings(parentContainer, containerToRefresh) end)
+            parentContainer:AddChild(moveUpButton)
+
+            local moveDownButton = AG:Create("Button")
+            moveDownButton:SetText("Down")
+            moveDownButton:SetRelativeWidth(0.1333)
+            moveDownButton:SetCallback("OnClick", function() BCDM:AdjustTrinketLayoutIndex(1, itemId) parentContainer:ReleaseChildren() CreateCooldownViewerTrinketSettings(parentContainer, containerToRefresh) end)
+            parentContainer:AddChild(moveDownButton)
+
+            local removeItemButton = AG:Create("Button")
+            removeItemButton:SetText("X")
+            removeItemButton:SetRelativeWidth(0.1333)
+            removeItemButton:SetCallback("OnClick", function()
+                BCDM:AdjustTrinketList(itemId, "remove")
+                BCDM:UpdateCooldownViewer("Trinket")
+                parentContainer:ReleaseChildren()
+                CreateCooldownViewerTrinketSettings(parentContainer, containerToRefresh)
+            end)
+            parentContainer:AddChild(removeItemButton)
+        end
+    end
+
+    containerToRefresh:DoLayout()
+
+    return parentContainer
+end
+
 local function CreateCooldownViewerSettings(parentContainer, viewerType)
-    local hasAnchorParent = viewerType == "Utility" or viewerType == "Buffs" or viewerType == "Custom" or viewerType == "AdditionalCustom" or viewerType == "Item"
-    local isCustomViewer = viewerType == "Custom" or viewerType == "AdditionalCustom" or viewerType == "Item"
+    local hasAnchorParent = viewerType == "Utility" or viewerType == "Buffs" or viewerType == "Custom" or viewerType == "AdditionalCustom" or viewerType == "Item" or viewerType == "Trinket"
+    local isCustomViewer = viewerType == "Custom" or viewerType == "AdditionalCustom" or viewerType == "Item" or viewerType == "Trinket"
 
     local ScrollFrame = AG:Create("ScrollFrame")
     ScrollFrame:SetLayout("Flow")
@@ -1082,6 +1150,15 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
     --     toggleContainer:AddChild(backgroundColourPicker)
     -- end
 
+    if viewerType == "Trinket" then
+        local enabledCheckbox = AG:Create("CheckBox")
+        enabledCheckbox:SetLabel("Enable Trinket Viewer")
+        enabledCheckbox:SetValue(BCDM.db.profile.CooldownManager.Trinket.Enabled)
+        enabledCheckbox:SetCallback("OnValueChanged", function(_, _, value) BCDM.db.profile.CooldownManager.Trinket.Enabled = value BCDM:UpdateCooldownViewer("Trinket") end)
+        enabledCheckbox:SetRelativeWidth(1)
+        ScrollFrame:AddChild(enabledCheckbox)
+    end
+
     local layoutContainer = AG:Create("InlineGroup")
     layoutContainer:SetTitle("Layout & Positioning")
     layoutContainer:SetFullWidth(true)
@@ -1099,7 +1176,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
     layoutContainer:AddChild(anchorFromDropdown)
 
     if hasAnchorParent then
-        AddAnchors("MidnightSimpleUnitFrames", {"Utility", "Custom"}, { ["MSUF_player"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Player Frame", ["MSUF_target"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Target Frame", })
+        AddAnchors("MidnightSimpleUnitFrames", {"Utility", "Custom", "AdditionalCustom"}, { ["MSUF_player"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Player Frame", ["MSUF_target"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Target Frame", })
         local anchorToParentDropdown = AG:Create("Dropdown")
         anchorToParentDropdown:SetLabel("Anchor To Parent")
         anchorToParentDropdown:SetList(AnchorParents[viewerType][1], AnchorParents[viewerType][2])
@@ -1129,7 +1206,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
         local spacingSlider = AG:Create("Slider")
         spacingSlider:SetLabel("Icon Spacing")
         spacingSlider:SetValue(BCDM.db.profile.CooldownManager[viewerType].Spacing)
-        spacingSlider:SetSliderValues(-1, 32, 1)
+        spacingSlider:SetSliderValues(-1, 32, 0.1)
         spacingSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CooldownManager[viewerType].Spacing = value BCDM:UpdateCooldownViewer(viewerType) end)
         spacingSlider:SetRelativeWidth(0.5)
         layoutContainer:AddChild(spacingSlider)
@@ -1359,7 +1436,7 @@ local function CreatePowerBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.PowerBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 1)
+    widthSlider:SetSliderValues(50, 1000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Width = value BCDM:UpdatePowerBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -1367,7 +1444,7 @@ local function CreatePowerBarSettings(parentContainer)
     local heightSlider = AG:Create("Slider")
     heightSlider:SetLabel("Height")
     heightSlider:SetValue(BCDM.db.profile.PowerBar.Height)
-    heightSlider:SetSliderValues(5, 500, 1)
+    heightSlider:SetSliderValues(5, 500, 0.1)
     heightSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Height = value BCDM:UpdatePowerBar() end)
     heightSlider:SetRelativeWidth(0.25)
     layoutContainer:AddChild(heightSlider)
@@ -1375,7 +1452,7 @@ local function CreatePowerBarSettings(parentContainer)
     local heightSliderWithoutSecondary = AG:Create("Slider")
     heightSliderWithoutSecondary:SetLabel("Height (No Secondary Power)")
     heightSliderWithoutSecondary:SetValue(BCDM.db.profile.PowerBar.HeightWithoutSecondary)
-    heightSliderWithoutSecondary:SetSliderValues(5, 500, 1)
+    heightSliderWithoutSecondary:SetSliderValues(5, 500, 0.1)
     heightSliderWithoutSecondary:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.HeightWithoutSecondary = value BCDM:UpdatePowerBar() end)
     heightSliderWithoutSecondary:SetRelativeWidth(0.25)
     heightSliderWithoutSecondary:SetDisabled(DetectSecondaryPower())
@@ -1623,7 +1700,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.SecondaryPowerBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 1)
+    widthSlider:SetSliderValues(50, 1000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.Width = value BCDM:UpdateSecondaryPowerBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -1631,7 +1708,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     local heightSlider = AG:Create("Slider")
     heightSlider:SetLabel("Height")
     heightSlider:SetValue(BCDM.db.profile.SecondaryPowerBar.Height)
-    heightSlider:SetSliderValues(5, 500, 1)
+    heightSlider:SetSliderValues(5, 500, 0.1)
     heightSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.Height = value BCDM:UpdateSecondaryPowerBar() end)
     heightSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(heightSlider)
@@ -1704,6 +1781,9 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     end
 
     RefreshSecondaryPowerBarGUISettings()
+
+    parentContainer:DoLayout()
+    ScrollFrame:DoLayout()
 
     return ScrollFrame
 end
@@ -1901,7 +1981,7 @@ local function CreateCastBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.CastBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 1)
+    widthSlider:SetSliderValues(50, 1000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CastBar.Width = value BCDM:UpdateCastBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -1909,7 +1989,7 @@ local function CreateCastBarSettings(parentContainer)
     local heightSlider = AG:Create("Slider")
     heightSlider:SetLabel("Height")
     heightSlider:SetValue(BCDM.db.profile.CastBar.Height)
-    heightSlider:SetSliderValues(5, 500, 1)
+    heightSlider:SetSliderValues(5, 500, 0.1)
     heightSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CastBar.Height = value BCDM:UpdateCastBar() end)
     heightSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(heightSlider)
@@ -2274,6 +2354,8 @@ function BCDM:CreateGUI()
             CreateCooldownViewerSettings(Wrapper, "AdditionalCustom")
         elseif MainTab == "Item" then
             CreateCooldownViewerSettings(Wrapper, "Item")
+        elseif MainTab == "Trinket" then
+            CreateCooldownViewerSettings(Wrapper, "Trinket")
         elseif MainTab == "PowerBar" then
             CreatePowerBarSettings(Wrapper)
         elseif MainTab == "SecondaryPowerBar" then
@@ -2304,6 +2386,7 @@ function BCDM:CreateGUI()
         { text = "Custom", value = "Custom"},
         { text = "Additional Custom", value = "AdditionalCustom"},
         { text = "Item", value = "Item"},
+        { text = "Trinkets", value = "Trinket"},
         { text = "Power Bar", value = "PowerBar"},
         { text = "Secondary Power Bar", value = "SecondaryPowerBar"},
         { text = "Cast Bar", value = "CastBar"},

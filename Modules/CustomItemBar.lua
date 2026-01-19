@@ -111,7 +111,6 @@ local function CreateCustomIcon(itemId)
             if itemCount then
                 customIcon.Charges:SetText(tostring(itemCount))
                 customIcon.Cooldown:SetCooldown(startTime, durationTime)
-                IsCooldownFrameActive(self)
                 if itemCount <= 0 then
                     customIcon.Icon:SetDesaturated(true)
                     customIcon.Charges:SetText("")
@@ -344,11 +343,4 @@ function BCDM:AdjustItemList(itemId, adjustingHow)
     end
 
     BCDM:UpdateCustomItemBar()
-end
-
-function BCDM:FetchTrinketSlots()
-    -- Loop through CharacterFrame
-    -- Get ItemID for Trinket Slots (13 & 14)
-    -- Return the ItemID and check if it's usable
-    local isItemUsable = C_Item.IsUsableItem(itemInfo)
 end
