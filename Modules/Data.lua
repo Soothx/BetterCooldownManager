@@ -269,11 +269,10 @@ local RACIALS = {
     [312370] = { isActive = true, layoutIndex = 24 }, -- Make Camp
     [312924] = { isActive = true, layoutIndex = 25 }, -- Hyper Organic Light Originator
     [107079] = { isActive = true, layoutIndex = 26 }, -- Quaking Palm
-    [369536] = { isActive = true, layoutIndex = 27 }, -- Soar
-    [368970] = { isActive = true, layoutIndex = 28 }, -- Tail Swipe
-    [357214] = { isActive = true, layoutIndex = 29 }, -- Wing Buffet
-    [436344] = { isActive = true, layoutIndex = 30 }, -- Azerite Surge
-    [1238623] = { isActive = true, layoutIndex = 31 }, -- Lash Out
+    [368970] = { isActive = true, layoutIndex = 27 }, -- Tail Swipe
+    [357214] = { isActive = true, layoutIndex = 28 }, -- Wing Buffet
+    [436344] = { isActive = true, layoutIndex = 29 }, -- Azerite Surge
+    [1237885] = { isActive = true, layoutIndex = 30 }, -- Thorn Bloom
 }
 
 function BCDM:AddRecommendedItems()
