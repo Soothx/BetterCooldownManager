@@ -240,10 +240,10 @@ local ITEMS = {
     [241304] = { isActive = true, layoutIndex = 1 }, -- Silvermoon Healing Potion
     [241308] = { isActive = true, layoutIndex = 2 }, -- Light's Potential
     [5512]   = { isActive = true, layoutIndex = 3 }, -- Healthstone
-    [224464] = { isActive = true, layoutIndex = 4 }, -- Demonic Healthstone
 }
 
 local RACIALS = {
+    [59752] = { isActive = true, layoutIndex = 1 }, -- Will To Survive
 }
 
 function BCDM:AddRecommendedItems()
