@@ -201,8 +201,8 @@ local function CreateCustomSpellIcon(spellId)
     local borderSize = BCDM.db.profile.CooldownManager.General.BorderSize
     customIcon.Icon:SetPoint("TOPLEFT", customIcon, "TOPLEFT", borderSize, -borderSize)
     customIcon.Icon:SetPoint("BOTTOMRIGHT", customIcon, "BOTTOMRIGHT", -borderSize, borderSize)
-    local iconZoom = BCDM.db.profile.CooldownManager.General.IconZoom * 0.5
-    customIcon.Icon:SetTexCoord(iconZoom, 1 - iconZoom, iconZoom, 1 - iconZoom)
+    local zoom = BCDM.db.profile.CooldownManager.General.IconZoom * 0.5
+    customIcon.Icon:SetTexCoord(BCDM:CalculateTexCoords(zoom, CustomDB.IconWidth, CustomDB.IconHeight))
     customIcon.Icon:SetTexture(C_Spell.GetSpellInfo(spellId).iconID)
 
     return customIcon
