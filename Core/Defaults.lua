@@ -426,6 +426,7 @@ local Defaults = {
             ColourBySpec = false,
             ColourByState = true,
             FrameStrata = "LOW",
+            HideTicks = false,
             BackgroundColour = {34/255, 34/255, 34/255, 1},
             ForegroundColour = {34/255, 34/255, 34/255, 1},
             Layout = {"BOTTOM", "BCDM_PowerBar", "TOP", 0, 1},
@@ -433,7 +434,8 @@ local Defaults = {
                 Enabled = false,
                 FontSize = 12,
                 Colour = {1, 1, 1},
-                Layout = {"CENTER", "CENTER", 0, 0}
+                Layout = {"CENTER", "CENTER", 0, 0},
+                ShowStaggerDPS = false,
             },
         },
         CastBar = {

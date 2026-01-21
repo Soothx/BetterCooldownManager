@@ -178,8 +178,7 @@ local function Position()
             viewerFrame:SetFrameStrata("LOW")
         elseif viewerFrame then
             viewerFrame:ClearAllPoints()
-            local anchorParent = viewerSettings.Layout[2] == "NONE" and UIParent or _G[viewerSettings.Layout[2]]
-            viewerFrame:SetPoint(viewerSettings.Layout[1], anchorParent, viewerSettings.Layout[3], viewerSettings.Layout[4], viewerSettings.Layout[5])
+            viewerFrame:SetPoint(viewerSettings.Layout[1], UIParent, viewerSettings.Layout[3], viewerSettings.Layout[4], viewerSettings.Layout[5])
             viewerFrame:SetFrameStrata("LOW")
         end
         NudgeViewer(viewerName, -0.1, 0)
@@ -271,29 +270,32 @@ end
 local function CenterBuffs()
     local visibleBuffIcons = {}
 
-    for _, childFrame in ipairs({BuffIconCooldownViewer:GetChildren()}) do
+    for _, childFrame in ipairs({ BuffIconCooldownViewer:GetChildren() }) do
         if childFrame and childFrame.Icon and childFrame:IsShown() then
             table.insert(visibleBuffIcons, childFrame)
         end
     end
-    local visibleCount = #visibleBuffIcons
 
+    table.sort(visibleBuffIcons, function(a, b)
+        return (a.layoutIndex or 0) < (b.layoutIndex or 0)
+    end)
+
+    local visibleCount = #visibleBuffIcons
     if visibleCount == 0 then return 0 end
 
     local iconWidth = visibleBuffIcons[1]:GetWidth()
     local iconSpacing = BuffIconCooldownViewer.childXPadding or 0
-
     local totalWidth = (visibleCount * iconWidth) + ((visibleCount - 1) * iconSpacing)
     local startX = -totalWidth / 2 + iconWidth / 2
 
     for index, iconFrame in ipairs(visibleBuffIcons) do
         iconFrame:ClearAllPoints()
-        local xPosition = startX + (index - 1) * (iconWidth + iconSpacing)
-        iconFrame:SetPoint("CENTER", BuffIconCooldownViewer, "CENTER", xPosition, 0)
+        iconFrame:SetPoint("CENTER", BuffIconCooldownViewer, "CENTER", startX + (index - 1) * (iconWidth + iconSpacing), 0)
     end
 
     return visibleCount
 end
+
 
 local centerBuffsEventFrame = CreateFrame("Frame")
 
