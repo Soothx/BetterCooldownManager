@@ -457,7 +457,7 @@ local function UpdatePowerValues()
         local textDisplay = AbbreviateLargeNumbers(powerCurrent)
         if secondaryPowerBarDB.Text.ShowStaggerDPS and powerCurrent > 0 then
             local damagePerTick = powerCurrent / 20
-            textDisplay = textDisplay .. " (" .. AbbreviateLargeNumbers(damagePerTick) .. "/0.5s)"
+            textDisplay = textDisplay .. " (" .. AbbreviateLargeNumbers(damagePerTick) .. " / 0.5s)"
         end
         secondaryPowerBar.Text:SetText(textDisplay)
         secondaryPowerBar.Status:Show()
