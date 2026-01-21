@@ -381,7 +381,8 @@ local Defaults = {
                 Trinkets = {},
             },
             ItemSpell = {
-                IconSize = 38,
+                IconWidth = 38,
+                IconHeight = 38,
                 FrameStrata = "LOW",
                 Layout = {"CENTER", "NONE", "CENTER", 0, 0},
                 Spacing = 1,
