@@ -1,6 +1,7 @@
 local _, BCDM = ...
 local Serialize = LibStub:GetLibrary("AceSerializer-3.0")
 local Compress = LibStub:GetLibrary("LibDeflate")
+local LEMO = LibStub("LibEditModeOverride-1.0")
 
 function BCDM:ExportSavedVariables()
     local profileData = { profile = BCDM.db.profile, }
@@ -26,7 +27,9 @@ function BCDM:ImportSavedVariables(encodedInfo, profileName)
             BCDM.db.profile[key] = value
         end
         BCDMG.RefreshProfiles()
+        LEMO:LoadLayouts()
         BCDM:UpdateBCDM()
+        LEMO:ApplyChanges()
         return
     end
     StaticPopupDialogs["BCDM_IMPORT_NEW_PROFILE"] = {
@@ -50,7 +53,9 @@ function BCDM:ImportSavedVariables(encodedInfo, profileName)
                 BCDM.db.profile[key] = value
             end
             BCDMG.RefreshProfiles()
+            LEMO:LoadLayouts()
             BCDM:UpdateBCDM()
+            LEMO:ApplyChanges()
         end,
     }
 
@@ -75,11 +80,13 @@ function BCDMG:ImportBCDM(importString, profileKey)
     local DecompressedInfo = Compress:DecompressDeflate(DecodedInfo)
     local success, profileData = Serialize:Deserialize(DecompressedInfo)
 
-    if not success or type(profileData) ~= "table" then print("|cFF8080FFUnhalted|r Unit Frames: Invalid Import String.") return end
+    if not success or type(profileData) ~= "table" then BCDM:PrettyPrint("Invalid Import String.") return end
 
     if type(profileData.profile) == "table" then
         BCDM.db.profiles[profileKey] = profileData.profile
         BCDM.db:SetProfile(profileKey)
+        LEMO:LoadLayouts()
         BCDM:UpdateBCDM()
+        LEMO:ApplyChanges()
     end
 end

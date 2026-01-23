@@ -3,8 +3,8 @@ local LEMO = LibStub("LibEditModeOverride-1.0")
 
 local function ShouldSkin()
     if not BCDM.db.profile.CooldownManager.Enable then return false end
-    if C_AddOns.IsAddOnLoaded("ElvUI") then return false end
-    if C_AddOns.IsAddOnLoaded("Masque") then return false end
+    if C_AddOns.IsAddOnLoaded("ElvUI") and ElvUI[1].private.skins.blizzard.cooldownManager then return false end
+    if C_AddOns.IsAddOnLoaded("MasqueBlizzBars") then return false end
     return true
 end
 
@@ -224,6 +224,7 @@ local function StyleIcons()
                 if childFrame.DebuffBorder then childFrame.DebuffBorder:SetAlpha(0) end
                 childFrame:SetSize(cooldownManagerSettings[BCDM.CooldownManagerViewerToDBViewer[viewerName]].IconWidth, cooldownManagerSettings[BCDM.CooldownManagerViewerToDBViewer[viewerName]].IconHeight)
                 BCDM:AddBorder(childFrame)
+                if not childFrame.layoutIndex then childFrame:SetShown(false) end
             end
         end
     end
@@ -326,6 +327,7 @@ local function SetupCenterBuffs()
 end
 
 function BCDM:SkinCooldownManager()
+    LEMO:LoadLayouts()
     C_CVar.SetCVar("cooldownViewerEnabled", 1)
     StyleIcons()
     StyleChargeCount()
@@ -333,9 +335,8 @@ function BCDM:SkinCooldownManager()
     -- C_Timer.After(1, function() StyleBuffsBars() end)
     SetHooks()
     SetupCenterBuffs()
-    for _, viewerName in ipairs(BCDM.CooldownManagerViewers) do
-        C_Timer.After(0.1, function() ApplyCooldownText(viewerName) end)
-    end
+    for _, viewerName in ipairs(BCDM.CooldownManagerViewers) do C_Timer.After(0.1, function() ApplyCooldownText(viewerName) end) end
+    C_Timer.After(1, function() LEMO:ApplyChanges() end)
 end
 
 function BCDM:UpdateCooldownViewer(viewerType)
@@ -349,7 +350,6 @@ function BCDM:UpdateCooldownViewer(viewerType)
     if viewerType == "ItemSpell" then BCDM:UpdateCustomItemsSpellsBar() return end
     if viewerType == "Buffs" then SetupCenterBuffs() end
 
-    LEMO:LoadLayouts()
 
     for _, childFrame in ipairs({cooldownViewerFrame:GetChildren()}) do
         if childFrame then
@@ -371,8 +371,6 @@ function BCDM:UpdateCooldownViewer(viewerType)
             childFrame:SetSize(cooldownManagerSettings[viewerType].IconWidth, cooldownManagerSettings[viewerType].IconHeight)
         end
     end
-
-    LEMO:ApplyChanges()
 
     StyleIcons()
 
