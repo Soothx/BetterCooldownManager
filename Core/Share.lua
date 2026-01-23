@@ -75,7 +75,7 @@ function BCDMG:ImportBCDM(importString, profileKey)
     local DecompressedInfo = Compress:DecompressDeflate(DecodedInfo)
     local success, profileData = Serialize:Deserialize(DecompressedInfo)
 
-    if not success or type(profileData) ~= "table" then print("|cFF8080FFUnhalted|r Unit Frames: Invalid Import String.") return end
+    if not success or type(profileData) ~= "table" then BCDM:PrettyPrint("Invalid Import String.") return end
 
     if type(profileData.profile) == "table" then
         BCDM.db.profiles[profileKey] = profileData.profile
