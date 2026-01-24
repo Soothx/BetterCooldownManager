@@ -1352,7 +1352,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
     layoutContainer:AddChild(anchorFromDropdown)
 
     if hasAnchorParent then
-        AddAnchors("MidnightSimpleUnitFrames", {"Utility", "Custom", "AdditionalCustom"}, { ["MSUF_player"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Player Frame", ["MSUF_target"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Target Frame", })
+        AddAnchors("MidnightSimpleUnitFrames", {"Utility", "Buffs", "Custom", "AdditionalCustom", "Item", "Trinket", "ItemSpell"}, { ["MSUF_player"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Player Frame", ["MSUF_target"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Target Frame", })
         local anchorToParentDropdown = AG:Create("Dropdown")
         anchorToParentDropdown:SetLabel("Anchor To Parent")
         anchorToParentDropdown:SetList(AnchorParents[viewerType][1], AnchorParents[viewerType][2])
@@ -1879,6 +1879,16 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     matchAnchorWidthCheckbox:SetRelativeWidth(1)
     toggleContainer:AddChild(matchAnchorWidthCheckbox)
 
+    local swapToPowerBarPositionCheckBox = AG:Create("CheckBox")
+    swapToPowerBarPositionCheckBox:SetLabel("Swap To Power Bar Position")
+    swapToPowerBarPositionCheckBox:SetDescription("|cFF33937FDevastation|r, |cFF33937FAugmentation|r, |cFFF48CBAProtection|r, |cFFF48CBARetribution|r, |cFF8788EEAffliction|r, |cFF8788EEDemonology|r, |cFF8788EEDestruction|r & |cFF0070DDEnhancement|r Support Only.")
+    swapToPowerBarPositionCheckBox:SetValue(BCDM.db.profile.SecondaryPowerBar.SwapToPowerBarPosition)
+    swapToPowerBarPositionCheckBox:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.SwapToPowerBarPosition = value BCDM:UpdateSecondaryPowerBar() end)
+    swapToPowerBarPositionCheckBox:SetCallback("OnEnter", function(self) GameTooltip:SetOwner(self.frame, "ANCHOR_CURSOR") GameTooltip:AddLine("If |cFF40FF40enabled|r, this will automatically decide when the |cFF8080FFSecondary|r Power Bar should be used in place of the |cFF8080FFPower|r Bar.", 1, 1, 1) GameTooltip:Show() end)
+    swapToPowerBarPositionCheckBox:SetCallback("OnLeave", function() GameTooltip:Hide() end)
+    swapToPowerBarPositionCheckBox:SetRelativeWidth(1)
+    toggleContainer:AddChild(swapToPowerBarPositionCheckBox)
+
     local foregroundColourPicker = AG:Create("ColorPicker")
     foregroundColourPicker:SetLabel("Foreground Colour")
     foregroundColourPicker:SetColor(BCDM.db.profile.SecondaryPowerBar.ForegroundColour[1], BCDM.db.profile.SecondaryPowerBar.ForegroundColour[2], BCDM.db.profile.SecondaryPowerBar.ForegroundColour[3], BCDM.db.profile.SecondaryPowerBar.ForegroundColour[4])
@@ -1986,6 +1996,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
                     child:SetDisabled(true)
                 end
             end
+            swapToPowerBarPositionCheckBox:SetDisabled(true)
         else
             for _, child in ipairs(toggleContainer.children) do
                 if child.SetDisabled then
@@ -2012,6 +2023,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
             else
                 widthSlider:SetDisabled(false)
             end
+            swapToPowerBarPositionCheckBox:SetDisabled(not BCDM:RepositionSecondaryBar())
         end
         RefreshSecondaryPowerBarTextGUISettings()
     end
