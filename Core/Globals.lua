@@ -54,7 +54,7 @@ local function SetupSlashCommands()
     BCDM:PrettyPrint("'|cFF8080FF/bcdm|r' for in-game configuration.")
 
     SLASH_BCDMRELOAD1 = "/rl"
-    SlashCmdList["BCDMRELOAD"] = function() ReloadUI() end
+    SlashCmdList["BCDMRELOAD"] = function() C_UI.Reload() end
 end
 
 local function PixelPerfect(value)
@@ -157,6 +157,7 @@ function BCDM:UpdateBCDM()
     BCDM:UpdateCustomItemBar()
     BCDM:UpdateCustomItemsSpellsBar()
     BCDM:UpdateTrinketBar()
+    BCDM:UpdateKeybinds()
 end
 
 function BCDM:CreateCooldownViewerOverlays()

@@ -429,6 +429,80 @@ local function CreateCooldownTextSettings(containerParent)
     return cooldownTextContainer
 end
 
+local function CreateKeybindSettings(containerParent)
+    local GeneralDB = BCDM.db.profile.General
+    local KeybindDB = BCDM.db.profile.CooldownManager.General.Keybinds
+
+    local keybindContainer = AG:Create("InlineGroup")
+    keybindContainer:SetTitle("Keybind Settings")
+    keybindContainer:SetFullWidth(true)
+    keybindContainer:SetLayout("Flow")
+    containerParent:AddChild(keybindContainer)
+
+    local enableKeybindCheckbox = AG:Create("CheckBox")
+    enableKeybindCheckbox:SetLabel("Enable Keybinds")
+    enableKeybindCheckbox:SetValue(KeybindDB.Enabled)
+    enableKeybindCheckbox:SetCallback("OnValueChanged", function(_, _, value)
+        KeybindDB.Enabled = value
+        BCDM.Keybinds:OnSettingChanged()
+        RefreshKeybindSettings()
+    end)
+    enableKeybindCheckbox:SetRelativeWidth(1)
+    keybindContainer:AddChild(enableKeybindCheckbox)
+
+    local anchorFromDropdown = AG:Create("Dropdown")
+    anchorFromDropdown:SetLabel("Anchor From")
+    anchorFromDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
+    anchorFromDropdown:SetValue(KeybindDB.AnchorFrom)
+    anchorFromDropdown:SetCallback("OnValueChanged", function(_, _, value) KeybindDB.AnchorFrom = value BCDM.Keybinds:UpdateAllKeybinds() end)
+    anchorFromDropdown:SetRelativeWidth(0.5)
+    keybindContainer:AddChild(anchorFromDropdown)
+
+    local anchorToDropdown = AG:Create("Dropdown")
+    anchorToDropdown:SetLabel("Anchor To")
+    anchorToDropdown:SetList(AnchorPoints[1], AnchorPoints[2])
+    anchorToDropdown:SetValue(KeybindDB.AnchorTo)
+    anchorToDropdown:SetCallback("OnValueChanged", function(_, _, value) KeybindDB.Anchor = value BCDM.Keybinds:UpdateAllKeybinds() end)
+    anchorToDropdown:SetRelativeWidth(0.5)
+    keybindContainer:AddChild(anchorToDropdown)
+
+    local xOffsetSlider = AG:Create("Slider")
+    xOffsetSlider:SetLabel("Offset X")
+    xOffsetSlider:SetValue(KeybindDB.OffsetX)
+    xOffsetSlider:SetSliderValues(-330, 50, 1)
+    xOffsetSlider:SetCallback("OnValueChanged", function(_, _, value) KeybindDB.OffsetX = value BCDM.Keybinds:UpdateAllKeybinds() end)
+    xOffsetSlider:SetRelativeWidth(0.33)
+    keybindContainer:AddChild(xOffsetSlider)
+
+    local yOffsetSlider = AG:Create("Slider")
+    yOffsetSlider:SetLabel("Offset Y")
+    yOffsetSlider:SetValue(KeybindDB.OffsetY)
+    yOffsetSlider:SetSliderValues(-50, 50, 1)
+    yOffsetSlider:SetCallback("OnValueChanged", function(_, _, value) KeybindDB.OffsetY = value BCDM.Keybinds:UpdateAllKeybinds() end)
+    yOffsetSlider:SetRelativeWidth(0.33)
+    keybindContainer:AddChild(yOffsetSlider)
+
+    local fontSizeSlider = AG:Create("Slider")
+    fontSizeSlider:SetLabel("Font Size")
+    fontSizeSlider:SetValue(KeybindDB.FontSize)
+    fontSizeSlider:SetSliderValues(8, 32, 1)
+    fontSizeSlider:SetCallback("OnValueChanged", function(_, _, value) KeybindDB.FontSize = value BCDM.Keybinds:UpdateAllKeybinds() end)
+    fontSizeSlider:SetRelativeWidth(0.33)
+    keybindContainer:AddChild(fontSizeSlider)
+
+    function RefreshKeybindSettings()
+        local enabled = KeybindDB.Enabled
+        anchorFromDropdown:SetDisabled(not enabled)
+        fontSizeSlider:SetDisabled(not enabled)
+        xOffsetSlider:SetDisabled(not enabled)
+        yOffsetSlider:SetDisabled(not enabled)
+    end
+
+    RefreshKeybindSettings()
+
+    return keybindContainer
+end
+
 local function CreateGeneralSettings(parentContainer)
     local GeneralDB = BCDM.db.profile.General
     local CooldownManagerDB = BCDM.db.profile.CooldownManager
@@ -654,7 +728,7 @@ local function CreateGlobalSettings(parentContainer)
             button1 = "Reload Now",
             button2 = "Later",
             showAlert = true,
-            OnAccept = function() BCDM.db.profile.CooldownManager.Enable = value ReloadUI() end,
+            OnAccept = function() BCDM.db.profile.CooldownManager.Enable = value C_UI.Reload() end,
             OnCancel = function() enableCDMSkinningCheckbox:SetValue(BCDM.db.profile.CooldownManager.Enable) globalSettingsContainer:DoLayout() end,
             timeout = 0,
             whileDead = true,
@@ -794,6 +868,8 @@ local function CreateGlobalSettings(parentContainer)
     AnimationContainer:AddChild(smoothBarsCheckbox)
 
     CreateCooldownTextSettings(globalSettingsContainer)
+
+    CreateKeybindSettings(globalSettingsContainer)
 
     ScrollFrame:DoLayout()
 
@@ -1272,7 +1348,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
                 button1 = "Reload Now",
                 button2 = "Later",
                 showAlert = true,
-                OnAccept = function() BCDM.db.profile.CooldownManager.Buffs.CenterBuffs = value ReloadUI() end,
+                OnAccept = function() BCDM.db.profile.CooldownManager.Buffs.CenterBuffs = value C_UI.Reload() end,
                 OnCancel = function() centerBuffsCheckbox:SetValue(BCDM.db.profile.CooldownManager.Buffs.CenterBuffs) toggleContainer:DoLayout() end,
                 timeout = 0,
                 whileDead = true,
@@ -1353,6 +1429,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
 
     if hasAnchorParent then
         AddAnchors("MidnightSimpleUnitFrames", {"Utility", "Buffs", "Custom", "AdditionalCustom", "Item", "Trinket", "ItemSpell"}, { ["MSUF_player"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Player Frame", ["MSUF_target"] = "|cFFFFD700Midnight|rSimpleUnitFrames: Target Frame", })
+        AddAnchors("ElvUI", {"Utility", "Custom", "AdditionalCustom", "Item", "ItemSpell", "Trinket"}, { ["ElvUF_Player"] = "|cff1784d1ElvUI|r: Player Frame", ["ElvUF_Target"] = "|cff1784d1ElvUI|r: Target Frame", })
         local anchorToParentDropdown = AG:Create("Dropdown")
         anchorToParentDropdown:SetLabel("Anchor To Parent")
         anchorToParentDropdown:SetList(AnchorParents[viewerType][1], AnchorParents[viewerType][2])
@@ -1391,7 +1468,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
     local xOffsetSlider = AG:Create("Slider")
     xOffsetSlider:SetLabel("X Offset")
     xOffsetSlider:SetValue(BCDM.db.profile.CooldownManager[viewerType].Layout[hasAnchorParent and 4 or 3])
-    xOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    xOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     xOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CooldownManager[viewerType].Layout[hasAnchorParent and 4 or 3] = value BCDM:UpdateCooldownViewer(viewerType) end)
     xOffsetSlider:SetRelativeWidth(0.25)
     layoutContainer:AddChild(xOffsetSlider)
@@ -1399,7 +1476,7 @@ local function CreateCooldownViewerSettings(parentContainer, viewerType)
     local yOffsetSlider = AG:Create("Slider")
     yOffsetSlider:SetLabel("Y Offset")
     yOffsetSlider:SetValue(BCDM.db.profile.CooldownManager[viewerType].Layout[hasAnchorParent and 5 or 4])
-    yOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    yOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     yOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CooldownManager[viewerType].Layout[hasAnchorParent and 5 or 4] = value BCDM:UpdateCooldownViewer(viewerType) end)
     yOffsetSlider:SetRelativeWidth(0.25)
     layoutContainer:AddChild(yOffsetSlider)
@@ -1642,7 +1719,7 @@ local function CreatePowerBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.PowerBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 0.1)
+    widthSlider:SetSliderValues(50, 3000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Width = value BCDM:UpdatePowerBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -1667,7 +1744,7 @@ local function CreatePowerBarSettings(parentContainer)
     local xOffsetSlider = AG:Create("Slider")
     xOffsetSlider:SetLabel("X Offset")
     xOffsetSlider:SetValue(BCDM.db.profile.PowerBar.Layout[4])
-    xOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    xOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     xOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Layout[4] = value BCDM:UpdatePowerBar() end)
     xOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(xOffsetSlider)
@@ -1675,7 +1752,7 @@ local function CreatePowerBarSettings(parentContainer)
     local yOffsetSlider = AG:Create("Slider")
     yOffsetSlider:SetLabel("Y Offset")
     yOffsetSlider:SetValue(BCDM.db.profile.PowerBar.Layout[5])
-    yOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    yOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     yOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.Layout[5] = value BCDM:UpdatePowerBar() end)
     yOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(yOffsetSlider)
@@ -1938,7 +2015,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.SecondaryPowerBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 0.1)
+    widthSlider:SetSliderValues(50, 3000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.Width = value BCDM:UpdateSecondaryPowerBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -1962,7 +2039,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     local xOffsetSlider = AG:Create("Slider")
     xOffsetSlider:SetLabel("X Offset")
     xOffsetSlider:SetValue(BCDM.db.profile.SecondaryPowerBar.Layout[4])
-    xOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    xOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     xOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.Layout[4] = value BCDM:UpdateSecondaryPowerBar() end)
     xOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(xOffsetSlider)
@@ -1970,7 +2047,7 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     local yOffsetSlider = AG:Create("Slider")
     yOffsetSlider:SetLabel("Y Offset")
     yOffsetSlider:SetValue(BCDM.db.profile.SecondaryPowerBar.Layout[5])
-    yOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    yOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     yOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.Layout[5] = value BCDM:UpdateSecondaryPowerBar() end)
     yOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(yOffsetSlider)
@@ -2239,7 +2316,7 @@ local function CreateCastBarSettings(parentContainer)
     local widthSlider = AG:Create("Slider")
     widthSlider:SetLabel("Width")
     widthSlider:SetValue(BCDM.db.profile.CastBar.Width)
-    widthSlider:SetSliderValues(50, 1000, 0.1)
+    widthSlider:SetSliderValues(50, 3000, 0.1)
     widthSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CastBar.Width = value BCDM:UpdateCastBar() end)
     widthSlider:SetRelativeWidth(0.5)
     layoutContainer:AddChild(widthSlider)
@@ -2255,7 +2332,7 @@ local function CreateCastBarSettings(parentContainer)
     local xOffsetSlider = AG:Create("Slider")
     xOffsetSlider:SetLabel("X Offset")
     xOffsetSlider:SetValue(BCDM.db.profile.CastBar.Layout[4])
-    xOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    xOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     xOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CastBar.Layout[4] = value BCDM:UpdateCastBar() end)
     xOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(xOffsetSlider)
@@ -2263,7 +2340,7 @@ local function CreateCastBarSettings(parentContainer)
     local yOffsetSlider = AG:Create("Slider")
     yOffsetSlider:SetLabel("Y Offset")
     yOffsetSlider:SetValue(BCDM.db.profile.CastBar.Layout[5])
-    yOffsetSlider:SetSliderValues(-1000, 1000, 0.1)
+    yOffsetSlider:SetSliderValues(-3000, 3000, 0.1)
     yOffsetSlider:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.CastBar.Layout[5] = value BCDM:UpdateCastBar() end)
     yOffsetSlider:SetRelativeWidth(0.33)
     layoutContainer:AddChild(yOffsetSlider)
