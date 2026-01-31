@@ -63,6 +63,20 @@ local ClassToPrettyClass = {
     ["EVOKER"]      = "|cFF33937FEvoker|r",
 }
 
+local ClassesWithSecondaryPower = {
+    ["MONK"]        = true,
+    ["ROGUE"]       = true,
+    ["DRUID"]       = true,
+    ["PALADIN"]     = true,
+    ["WARLOCK"]     = true,
+    ["MAGE"]        = true,
+    ["EVOKER"]      = true,
+    ["DEATHKNIGHT"] = true,
+    ["DEMONHUNTER"] = true,
+    ["SHAMAN"]      = true,
+    ["PRIEST"]      = true,
+}
+
 local function DeepDisable(widget, disabled, skipWidget)
     if widget == skipWidget then return end
     if widget.SetDisabled then widget:SetDisabled(disabled) end
@@ -1487,6 +1501,12 @@ local function CreatePowerBarSettings(parentContainer)
     heightSliderWithoutSecondary:SetSliderValues(5, 500, 0.1)
     heightSliderWithoutSecondary:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.PowerBar.HeightWithoutSecondary = value BCDM:UpdatePowerBar() end)
     heightSliderWithoutSecondary:SetRelativeWidth(0.25)
+    heightSliderWithoutSecondary:SetCallback("OnEnter", function(self)
+        GameTooltip:SetOwner(self.frame, "ANCHOR_CURSOR")
+        GameTooltip:AddLine("This height is used when the player does |cFFFF4040NOT|r have a Secondary Power Bar, such as |cFFC79C6EWarrior|r or |cFFABD473Hunter|r")
+        GameTooltip:Show()
+    end)
+    heightSliderWithoutSecondary:SetCallback("OnLeave", function() GameTooltip:Hide() end)
     heightSliderWithoutSecondary:SetDisabled(DetectSecondaryPower())
     layoutContainer:AddChild(heightSliderWithoutSecondary)
 
@@ -1719,7 +1739,12 @@ local function CreateSecondaryPowerBarSettings(parentContainer)
     showManaBarCheckbox:SetLabel("Show Mana Bar")
     showManaBarCheckbox:SetDescription("Displays the Secondary Power Bar as Mana for Shadow and |cFF0070DDElemental|r")
     showManaBarCheckbox:SetValue(BCDM.db.profile.SecondaryPowerBar.ShowManaBar)
-    showManaBarCheckbox:SetCallback("OnValueChanged", function(self, _, value) BCDM.db.profile.SecondaryPowerBar.ShowManaBar = value BCDM:UpdateSecondaryPowerBar() RefreshSecondaryPowerBarGUISettings() end)
+    showManaBarCheckbox:SetCallback("OnValueChanged", function(self, _, value)
+        BCDM.db.profile.SecondaryPowerBar.ShowManaBar = value
+        BCDM:UpdateSecondaryPowerBar()
+        BCDM:UpdatePowerBar()
+        RefreshSecondaryPowerBarGUISettings()
+    end)
     showManaBarCheckbox:SetRelativeWidth(1)
     toggleContainer:AddChild(showManaBarCheckbox)
 
